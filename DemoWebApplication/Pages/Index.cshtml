@@ -1,0 +1,28 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Dynamics 365 F&O Integration Demo";
+}
+<h2>@ViewData["Title"]</h2>
+
+@*<div class="container-fluid">
+    <h1> @{ViewData["Title"] = "Dynamics 365 F&O integration demo";}</h1>
+    <div class="row">
+        <div class="col-sm-4">
+            @using (Html.BeginForm("Index", "IndexModel", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+                @Html.DropDownListFor(model => model.ProductID, Model.GetDistinctProductsAsync().Result, "Select a product...", new { @class = "form-control", onchange = "this.form.submit();" })
+            }
+        </div>
+        <div class="col-sm-8"></div>
+    </div>
+    <br />
+    <p1>@Model.NotAvailableMessage</p1>
+    <div class="row">
+        <div class="col-sm-3">
+            <canvas id="myChart" width="50" height="50"></canvas>
+        </div>
+        <div class="col-sm-8"></div>
+    </div>
+</div>*@
+

@@ -1,0 +1,119 @@
+﻿@page
+@model Demo2Model
+@{
+    ViewData["Title"] = "Demo 2 - Synchronous integration – Azure API Management";
+}
+<h4>@ViewData["Title"]</h4>
+
+<div class="row" style="margin-left:5px">
+    <img width="50" src="~/images/Azure App Service_COLOR.png" />
+    <img style="margin-left:4px" width="50" src="~/images/Azure Active Directory_COLOR.png" />
+    <img style="margin-left:4px" width="50" src="~/images/Azure Security Center _COLOR.png" />
+    <img style="margin-left:4px" width="50" src="~/images/Azure API Management_COLOR.png" />
+    <img style="margin-left:4px" width="50" src="~/images/odata.png" />
+    <img style="margin-left:4px" width="50" src="~/images/FO.png" />
+</div>
+<hr />
+
+<div>
+    @*<h1> @{ViewData["Title"] = "Demo 2 - Synchronous integration – Azure API Management";}</h1>*@
+    <div class="row">
+        <div class="col-sm-4">
+            @using (Html.BeginForm("Demo2", "Demo2Model", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+                @Html.DropDownListFor(model => model.ProductID, Model.GetDistinctProductsAsync().Result, "Select a product...", new { @class = "form-control", onchange = "this.form.submit();" })
+            }
+        </div>
+        <div class="col-sm-8"></div>
+    </div>
+    <br />
+    <p1>@Model.NotAvailableMessage</p1>
+    <div class="row">
+        <div class="col-sm-3">
+            <canvas id="myChart" width="50" height="50"></canvas>
+        </div>
+        <div class="col-sm-8"></div>
+    </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.js"></script>
+<script>
+            var ctx = document.getElementById("myChart").getContext('2d');
+            var myChart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ["Available", "Reserved", "Ordered"],
+                    datasets: [{
+                        label: 'OnHand',
+                        data: @Model.OnhandData,
+                        backgroundColor: [
+                            'rgba(0, 114, 198, 1)',
+                            'rgba(154, 154, 154, 1)',
+                            'rgba(54, 162, 235, 1)',
+
+                            'rgba(75, 192, 192, 0.2)',
+                            'rgba(153, 102, 255, 0.2)',
+                            'rgba(255, 159, 64, 0.2)'
+                        ],
+                        borderColor: [
+                            'rgba(255,99,132,1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(153, 102, 255, 1)',
+                            'rgba(255, 159, 64, 1)'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+
+                    plugins: {
+                        datalabels: {
+                            display: function (context) {
+                                return context.dataset.data[context.dataIndex] >= 0.0
+                            }
+                        }
+                    },
+
+
+                    events: false,
+                    animation: {
+                        duration: 500,
+                        easing: "easeOutQuart",
+                        onComplete: function () {
+                            var ctx = this.chart.ctx;
+                            ctx.font = Chart.helpers.fontString(Chart.defaults.global.defaultFontFamily, 'normal', Chart.defaults.global.defaultFontFamily);
+                            ctx.textAlign = 'center';
+                            ctx.textBaseline = 'bottom';
+
+                            this.data.datasets.forEach(function (dataset) {
+
+                                for (var i = 0; i < dataset.data.length; i++) {
+                                    var model = dataset._meta[Object.keys(dataset._meta)[0]].data[i]._model,
+                                        total = dataset._meta[Object.keys(dataset._meta)[0]].total,
+                                        mid_radius = model.innerRadius + (model.outerRadius - model.innerRadius) / 2,
+                                        start_angle = model.startAngle,
+                                        end_angle = model.endAngle,
+                                        mid_angle = start_angle + (end_angle - start_angle) / 2;
+
+                                    var x = mid_radius * Math.cos(mid_angle);
+                                    var y = mid_radius * Math.sin(mid_angle);
+
+                                    ctx.fillStyle = '#fff';
+                                    if (i == 3) { // Darker text color for lighter background
+                                        ctx.fillStyle = '#444';
+                                    }
+                                    var percent = String(Math.round(dataset.data[i] / total * 100)) + "%";
+                                    ctx.fillText(dataset.data[i], model.x + x, model.y + y);
+                                    // Display percent in another line, line break doesn't work for fillText
+                                    //ctx.fillText(percent, model.x + x, model.y + y + 15);
+                                }
+                            });
+                        }
+                    },
+
+
+                }
+    });
+
+</script>

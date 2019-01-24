@@ -1,0 +1,173 @@
+﻿@page
+@using Microsoft.Dynamics.DataEntities;
+@using Microsoft.OData.Client;
+@model Demo1Model
+@{
+    ViewData["Title"] = "Demo 1 - Synchronous integration - OData";
+}
+<h4>@ViewData["Title"]</h4>
+@*<h3>@Model.Message</h3>*@
+
+<script src="~/lib/jquery/dist/jquery.js"></script>
+<script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+
+
+
+<div>
+
+    <div class="row" style="margin-left:5px">
+        <img style="margin-left:4px" width="50" src="~/images/Azure App Service_COLOR.png" />
+        <img style="margin-left:4px" width="50" src="~/images/Azure Active Directory_COLOR.png" />
+        <img style="margin-left:4px" width="50" src="~/images/odata.png" />
+        <img style="margin-left:4px" width="50" src="~/images/FO.png" />
+    </div>
+    <hr />
+    <div>
+
+        <h3>Purchase order header</h3>
+        
+        <form method="post" asp-page-handler="SalesOrderBody">
+            <div>
+
+                <div class="row">
+
+                    <div class="col-md-2">
+                        <label>Vendor account</label>
+                        @Html.DropDownListFor(model => model.SelectedCustomerAccount, Model.GeCustomerAccountsAsync().Result, "Select...", new { @class = "form-control", onchange = "this.form.submit();" })
+                    </div>
+                    <div class="col-sm-3">
+                        <label>Order number</label>
+                        <input asp-for="ImputOrderNumber" class="form-control" />
+                    </div>
+                </div>
+
+            </div>
+            <hr />
+            <h3>Order lines</h3>
+            <br />
+            <div class="row">
+                <div class="col-sm-4">
+                    <label>Product name</label>
+                    @Html.DropDownListFor(model => model.SelectedProductNumber, Model.GetDistinctProductsAsync().Result, "Select...", new { @class = "form-control", onchange = "this.form.submit();" })
+                </div>
+                <div class="col-sm-2">
+                    <label>Quantity</label>
+                    <input asp-for="ImputOrderQuantity" class="form-control">
+                </div>
+            </div>
+            <br />
+            <div class="row">
+
+                <div class="col-sm-3">
+                    <label>Product number (w/o validation)</label>
+                    <input asp-for="IputProductNumber" class="form-control" />
+                </div>
+            </div>
+            <hr />
+            <input type="submit" asp-page-handler="SalesOrderLine" value="Submit" class="btn btn-primary" />
+            <a class="btn btn-default" href="./Demo1">Cancel</a>
+            <hr />
+            <div class="center-block">
+                @if (Model.IsPosted != null)
+                {
+                    <div lass="center-block">
+                        @if (Model.IsPosted == false)
+                        {
+                            <div class="row">
+                                <div class="col-sm-1">
+                                    <img src="~/images/fail.png" />
+                                </div>
+                                <div class="col-sm-1">
+                                    <h6>Batch</h6>
+                                    @if (Model.BathStatusCode == "200")
+                                    {
+                                        <h6 style="color:limegreen">@Model.BathStatusCode</h6>
+                                    }
+                                    else
+                                    {
+                                        <h6 style="color:crimson">@Model.BathStatusCode</h6>
+                                    }
+
+                                </div>
+                                <div class="col-sm-1">
+                                    <h6>Operation 1</h6>
+                                    @if (Model.Op1Status == "200" || Model.Op1Status == "201")
+                                    {
+                                        <h6 style="color:limegreen">@Model.Op1Status</h6>
+                                    }
+                                    else
+                                    {
+                                        <h6 style="color:crimson">@Model.Op1Status</h6>
+
+                                    }
+                                </div>
+                                <div class="col-sm-1">
+
+                                    <h6>Operation 2</h6>
+                                    @if (Model.Op2Status == "200" || Model.Op2Status == "201")
+                                    {
+
+                                        <h6 style="color:limegreen">@Model.Op2Status</h6>
+                                    }
+                                    else
+                                    {
+
+                                        <h6 style="color:crimson">@Model.Op2Status</h6>
+                                    }
+                                </div>
+                            </div>
+                            <br />
+                            <h6 style="color:crimson">@Model.FailMessage</h6>
+                        }
+                        else
+                        {
+                            <div class="row">
+                                <div class="col-sm-1">
+                                    <img src="~/images/check.png" />
+                                </div>
+                                <div class="col-sm-1">
+                                    <h6>Batch</h6>
+                                    <h6 style="color:limegreen">@Model.BathStatusCode</h6>
+                                </div>
+                                <div class="col-sm-1">
+                                    <h6>Operation 1</h6>
+                                    @if (Model.Op1Status == "200" || Model.Op1Status == "201")
+                                    {
+                                        <h6 style="color:limegreen">@Model.Op1Status</h6>
+                                    }
+                                    else
+                                    {
+                                        <h6 style="color:crimson">@Model.Op1Status</h6>
+
+                                    }
+                                </div>
+                                <div class="col-sm-1">
+                                    <h6>Operation 2</h6>
+                                    @if (Model.Op2Status == "200" || Model.Op2Status == "201")
+                                    {
+                                        <h6 style="color:limegreen">@Model.Op2Status</h6>
+                                    }
+                                    else
+                                    {
+                                        <h6 style="color:crimson">@Model.Op2Status</h6>
+                                    }
+                                </div>
+                            </div>
+                            <br />
+                            var url = "<a href=" + Model.DeepLink + ">Go to order</a>";
+                            //string textrev = url;
+                            @Html.Raw(url)
+                            <div>
+                                <textbox style="font-size:x-small;">[Secured URL]</textbox>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </form>
+
+    </div>
+
+
+</div>
